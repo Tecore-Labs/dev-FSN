@@ -1,0 +1,96 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "ccns.fullname" . }}
+  labels:
+    app: {{ template "ccns.name" . }}
+    chart: {{ template "ccns.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "ccns.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "ccns.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: ccns
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+        # readinessProbe:
+          # httpGet:
+            # path: /nynja/ethereum/api.v.1.0/version
+            # port: http
+          # successThreshold: 1
+          # failureThreshold: 60
+          # initialDelaySeconds: 15
+          # periodSeconds: 3
+          # timeoutSeconds: 15
+       # livenessProbe:
+          # httpGet:
+            # path: /nynja/ethereum/api.v.1.0/version
+            # port: http
+          # successThreshold: 1
+          # failureThreshold: 15
+          # initialDelaySeconds: 30
+          # periodSeconds: 3
+          # timeoutSeconds: 15
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        env:
+        - name: SERVER_PORT
+          value: {{ .Values.service.port | quote }} 
+        - name: SPRING_DATA_CASSANDRA_KEYSPACE-NAME
+          value: {{ index .Values.spring.data.cassandra "keyspace-name" | quote }}
+        - name: SPRING_DATA_CASSANDRA_CONTACT-POINTS
+          value: {{ index .Values.spring.data.cassandra "contact-points" | quote }}
+        - name: SPRING_DATA_CASSANDRA_PORT
+          value: {{ .Values.spring.data.cassandra.port | quote }}
+{{- if .Values.neo4j.username }}
+        - name: NEO4J_USERNAME
+          value: {{ .Values.neo4j.username | quote }}
+        - name: NEO4J_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "ccns.fullname" . }}-neopwd
+              key: password
+{{- end }}
+        - name: NEO4J_URI
+          value: {{ .Values.neo4j.uri | quote }}
+        - name: SERVICES_CNMS_ADDRESS
+          value: {{ .Values.services.cnms.address | quote }}
+        - name: SERVICES_CNMS_PORT
+          value: {{ .Values.services.cnms.port | quote }}
+        - name: SERVICES_CATS_ADDRESS
+          value: {{ .Values.services.cats.address | quote }}
+        - name: SERVICES_CATS_PORT
+          value: {{ .Values.services.cats.port | quote }}
+        - name: SERVICES_CAMS_ADDRESS
+          value: {{ .Values.services.cams.address | quote }}
+        - name: SERVICES_CAMS_PORT
+          value: {{ .Values.services.cams.port | quote }}
+        - name: SERVICES_CCMS_ADDRESS
+          value: {{ .Values.services.ccms.address | quote }}
+        - name: SERVICES_CCMS_PORT
+          value: {{ .Values.services.ccms.port | quote }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

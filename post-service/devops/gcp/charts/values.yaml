@@ -1,0 +1,74 @@
+
+replicaCount: 1
+
+image:
+  #repository: gcr.io/tl-dev-212306/${NAMESPACE}/${APP_NAME}
+  repository: gcr.io/cogent-osprey-252813/post/cpms
+  #tag: develop-12
+  tag: master-2.20
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 700Mi
+  requests:
+    cpu: 20m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+service:
+  type: "ClusterIP"
+  port: 8080
+
+gateway:
+  selector:
+  - api-gateway.istio-system.svc.cluster.local
+  #- api-gateway
+  hosts:
+  - post.examprime.com
+
+# CASSANDRA PROPERTIES
+
+cassandra:
+  port: 9042
+  keyspace: "comrate"
+  userName:
+  password:
+  contactPoints: "cassandra.cassandra.svc.cluster.local"
+
+services:
+  cims:
+    address: "http://filemanager-cims.filemanager.svc.cluster.local"
+    port: "8080"
+  ccns:
+    address: "http://network-ccns.network.svc.cluster.local"
+    port: "8080"
+  ccms:                      
+    address: "http://companyservice-ccms.companyservice.svc.cluster.local"
+    port: "8080"
+  cams:                        
+    address: "http://account-cams.account.svc.cluster.local"   
+    port: "8080"
+  cnms:
+    address: "http://notification-cnms.notification.svc.cluster.local"
+    port: "8080"
+  cgss:
+    address: "http://globalsearch-cgms.globalsearch.svc.cluster.local"
+    port: "8080"
+  cats:
+    address: "http://auth-cats.auth.svc.cluster.local"
+    port: "8080"    
+# VALID EXTENSIONS
+valid:
+  image:
+    extensions: jpg|png|gif|bmp
+  video:
+    extensions: mp4|3gp|mpeg|avi|mov
+  full:
+    extensions: jpg|png|gif|bmp|mp4|3gp|mpeg|avi|mov

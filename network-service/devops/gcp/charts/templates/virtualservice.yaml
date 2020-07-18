@@ -1,0 +1,29 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ template "ccns.fullname" . }}
+  labels:
+    app: {{ template "ccns.name" . }}
+    chart: {{ template "ccns.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  gateways:
+  {{- range .Values.gateway.selector }}
+  - {{ . }}
+  {{- end }}
+  hosts:
+  {{- range .Values.gateway.hosts }}
+  - {{ . }}
+  {{- end }}
+  #- "*"
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: {{ template "ccns.fullname" . }}
+        port:
+          number: {{ .Values.service.port }}
+    timeout: 30s

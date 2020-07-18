@@ -1,0 +1,29 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ template "cpms.fullname" . }}
+  labels:
+    app: {{ template "cpms.name" . }}
+    chart: {{ template "cpms.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  gateways:
+  {{- range .Values.gateway.selector }}
+  - {{ . }}
+  {{- end }}
+  hosts:
+  {{- range .Values.gateway.hosts }}
+  - {{ . }}
+  {{- end }}
+  #- "*"
+  http:
+  - match:
+    - uri:
+        prefix: /cpms
+    route:
+    - destination:
+        host: {{ template "cpms.fullname" . }}
+        port:
+          number: {{ .Values.service.port }}
+    timeout: 30s

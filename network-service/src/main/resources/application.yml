@@ -1,0 +1,36 @@
+# SERVER PROPERTIES
+server:
+  port: 8085
+  servlet:
+    contextPath: /
+
+
+#CASSANDRA CONFIG
+spring:
+  data:
+    cassandra:
+      keyspace-name: comrate
+      contact-points: 127.0.0.1
+      port: 9042
+
+
+# NEO4J CONFIGURATION
+neo4j:
+  username: neo4j
+  password: comrate
+  uri: bolt://localhost:7687
+
+# SERVICE CONFIGURATION
+services:
+  cnms:                                 #notification service
+    address: "http://localhost"
+    port: "8086"
+  cats:                                 #auth service
+    address: "http://localhost"
+    port: "8090"
+  cams:                                 #account service
+     address: "http://localhost"
+     port: "8082"
+  ccms:                                 #company service
+    address: "http://localhost"
+    port: "8087"

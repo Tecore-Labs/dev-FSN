@@ -1,0 +1,57 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+# SERVER PROPERTIES
+server:
+  port: 8083
+  servlet:
+    contextPath: /cpms
+
+# CASSANDRA PROPERTIES
+cassandra:
+  port: 9042
+  keyspace: comrate
+  userName: null
+  password: null
+  contactPoints: 127.0.0.1
+
+  # SERVICES PROPERTIES
+services:
+  cims:
+    address: "http://localhost"          # (Address: Comrate_Image_Management_Services)
+    port: "8088"                     # (Port: Comrate_Image_Management_Services)
+  ccns:                             # comrate contact network service
+    address: "http://localhost"
+    port: "8085"
+  ccms:                      # (Calling company service for get some info)
+    address: "http://localhost"     # (Address of company info)
+    port: "8087"                    # (Company run on 8087)
+  cams:                        # (Calling account service for get some info)
+      address: "http://localhost"   # (Address of account service)
+      port: "8082"                   # (account run on 8082)
+  cnms:                                 #notification service
+    address: "http://localhost"
+    port: "8086"
+  cgss:                           #global search service
+    address: "http://localhost"
+    port: "8084"
+  cats:                                 #auth service
+    address: "http://localhost"
+    port: "8090"
+
+
+
+# VALID EXTENSIONS
+valid:
+  image:
+    extensions: jpg|png|gif|bmp
+  video:
+    extensions: mp4|3gp|mpeg|avi|mov
+  full:
+    extensions: jpg|png|gif|bmp|mp4|3gp|mpeg|avi|mov
+

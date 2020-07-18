@@ -1,0 +1,63 @@
+
+replicaCount: 1
+
+image:
+  #repository: gcr.io/tl-dev-212306/${NAMESPACE}/${APP_NAME}
+  repository: gcr.io/cogent-osprey-252813/network/ccns
+  #tag: develop-12
+  tag: master-2.14
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 700Mi
+  requests:
+    cpu: 20m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+# SERVER PROPERTIES
+service:
+  type: "ClusterIP"
+  port: 8080
+
+#CASSANDRA CONFIG
+spring:
+  data:
+    cassandra:
+      keyspace-name: "comrate"
+      contact-points: "cassandra.cassandra.svc.cluster.local"
+      port: 9042
+
+gateway:
+  selector:
+  - api-gateway.istio-system.svc.cluster.local
+  #- api-gateway
+  hosts:
+  - network.examprime.com
+
+# NEO4J CONFIGURATION
+neo4j:
+  username: "neo4j"
+  password: "comrate123"
+  uri: "bolt://neo4j-helm-neo4j-core-0.neo4j-helm-neo4j.neo4j.svc.cluster.local:7687"
+
+# SERVICE CONFIGURATION
+services:
+  cnms:
+    address: "http://notification-cnms.notification.svc.cluster.local"
+    port: "8080"
+  cats:
+    address: "http://auth-cats.auth.svc.cluster.local"
+    port: "8080"
+  cams:
+    address: "http://account-cams.account.svc.cluster.local"
+    port: "8080"
+  ccms:
+    address: "http://companyservice-ccms.companyservice.svc.cluster.local"
+    port: "8080"

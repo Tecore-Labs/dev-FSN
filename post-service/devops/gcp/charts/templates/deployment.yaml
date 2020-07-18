@@ -1,0 +1,112 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "cpms.fullname" . }}
+  labels:
+    app: {{ template "cpms.name" . }}
+    chart: {{ template "cpms.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "cpms.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "cpms.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: cpms
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+        # readinessProbe:
+          # httpGet:
+            # path: /nynja/ethereum/api.v.1.0/version
+            # port: http
+          # successThreshold: 1
+          # failureThreshold: 60
+          # initialDelaySeconds: 15
+          # periodSeconds: 3
+          # timeoutSeconds: 15
+       # livenessProbe:
+          # httpGet:
+            # path: /nynja/ethereum/api.v.1.0/version
+            # port: http
+          # successThreshold: 1
+          # failureThreshold: 15
+          # initialDelaySeconds: 30
+          # periodSeconds: 3
+          # timeoutSeconds: 15
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        env:
+        - name: SERVER_PORT
+          value: {{ .Values.service.port | quote }} 
+        - name: CASSANDRA_PORT
+          value: {{ .Values.cassandra.port | quote }}
+        - name: CASSANDRA_KEYSPACE
+          value: {{ .Values.cassandra.keyspace | quote }}
+{{- if .Values.cassandra.username }}
+        - name: CASSANDRA_USERNAME
+          value: {{ .Values.cassandra.username | quote }}
+        - name: CASSANDRA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "cpms.fullname" . }}-casspwd
+              key: password
+{{- end }}
+        - name: CASSANDRA_CONTACTPOINTS
+          value: {{ .Values.cassandra.contactPoints | quote }}
+        - name: SERVICES_CIMS_ADDRESS
+          value: {{ .Values.services.cims.address | quote }}
+        - name: SERVICES_CIMS_PORT
+          value: {{ .Values.services.cims.port | quote }}
+        - name: SERVICES_CCNS_ADDRESS
+          value: {{ .Values.services.ccns.address | quote }}
+        - name: SERVICES_CCNS_PORT
+          value: {{ .Values.services.ccns.port | quote }}
+        - name: SERVICES_CCMS_ADDRESS
+          value: {{ .Values.services.ccms.address | quote }}
+        - name: SERVICES_CCMS_PORT
+          value: {{ .Values.services.ccms.port | quote }}
+        - name: SERVICES_CAMS_ADDRESS
+          value: {{ .Values.services.cams.address | quote }}
+        - name: SERVICES_CAMS_PORT
+          value: {{ .Values.services.cams.port | quote }}
+        - name: SERVICES_CNMS_ADDRESS
+          value: {{ .Values.services.cnms.address | quote }}
+        - name: SERVICES_CNMS_PORT
+          value: {{ .Values.services.cnms.port | quote }}
+        - name: SERVICES_CGSS_ADDRESS
+          value: {{ .Values.services.cgss.address | quote }}
+        - name: SERVICES_CGSS_PORT
+          value: {{ .Values.services.cgss.port | quote }}
+        - name: SERVICES_CATS_ADDRESS
+          value: {{ .Values.services.cats.address | quote }}
+        - name: SERVICES_CATS_PORT
+          value: {{ .Values.services.cats.port | quote }}
+        - name: VALID_IMAGE_EXTENSIONS
+          value: {{ .Values.valid.image.extensions | quote }}
+        - name: VALID_VIDEO_EXTENSIONS
+          value: {{ .Values.valid.video.extensions | quote }}
+        - name: VALID_FULL_EXTENSIONS
+          value: {{ .Values.valid.full.extensions | quote }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
